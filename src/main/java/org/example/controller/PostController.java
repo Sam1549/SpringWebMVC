@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.model.Post;
+import org.example.model.PostDto;
 import org.example.service.PostService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,18 +17,18 @@ public class PostController {
     }
 
     @GetMapping
-    public List<Post> all() {
+    public List<PostDto> all() {
         return postService.all();
     }
 
     @GetMapping("/{id}")
-    public Post getById(@PathVariable long id) {
+    public PostDto getById(@PathVariable long id) {
         return postService.getById(id);
     }
 
     @PostMapping
-    public Post save(@RequestBody Post post) {
-        return postService.save(post);
+    public PostDto save(@RequestBody PostDto postDto) {
+        return postService.save(postDto);
     }
 
     @DeleteMapping("/{id}")

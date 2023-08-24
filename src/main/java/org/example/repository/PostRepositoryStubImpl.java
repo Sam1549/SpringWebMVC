@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Repository
 public class PostRepositoryStubImpl implements PostRepository {
@@ -21,11 +22,14 @@ public class PostRepositoryStubImpl implements PostRepository {
     }
 
     public List<Post> all() {
-        return new ArrayList<>(posts.values());
+        return new ArrayList<>(posts.values().stream()
+                .filter(v -> !v.isRemoved())
+                .collect(Collectors.toList()));
     }
 
     public Optional<Post> getById(long id) {
-        return Optional.ofNullable(posts.get(id));
+       Optional<Post> post = posts.get(id).isRemoved() ? (Optional<Post>) Optional.empty().orElseThrow(NotFoundException::new) : Optional.ofNullable(posts.get(id));
+        return post;
     }
 
     public Post save(Post post) {
@@ -33,21 +37,21 @@ public class PostRepositoryStubImpl implements PostRepository {
             throw new NotFoundException();
         } else {
             if (posts.containsKey(post.getId())) {
-                posts.put(post.getId(), post);
+                    posts.put(post.getId(), post);
+                System.out.println(post.getContent());
             }
             if (post.getId() == 0) {
                 post.setId(idCounter.incrementAndGet());
                 posts.put(post.getId(), post);
+                System.out.println(post.getContent());
             }
         }
         return post;
     }
 
-    public void removeById(long id) {
-        if (posts.containsKey(id)) {
-            posts.remove(id);
-        } else {
-            throw new NotFoundException("Вы ввели не верный ID");
-        }
+    public Optional<Post> removeById(long id) {
+        Optional<Post> post = Optional.ofNullable(posts.get(id));
+        post.ifPresent(value -> value.setRemoved(true));
+        return post;
     }
 }
