@@ -28,7 +28,7 @@ public class PostRepositoryStubImpl implements PostRepository {
     }
 
     public Optional<Post> getById(long id) {
-       Optional<Post> post = posts.get(id).isRemoved() ? (Optional<Post>) Optional.empty().orElseThrow(NotFoundException::new) : Optional.ofNullable(posts.get(id));
+        Optional<Post> post = posts.get(id).isRemoved() ? (Optional<Post>) Optional.empty().orElseThrow(NotFoundException::new) : Optional.ofNullable(posts.get(id));
         return post;
     }
 
@@ -37,13 +37,16 @@ public class PostRepositoryStubImpl implements PostRepository {
             throw new NotFoundException();
         } else {
             if (posts.containsKey(post.getId())) {
+                Post post1 = posts.get(post.getId());
+                if (post1.isRemoved()) {
+                    throw new NotFoundException();
+                } else {
                     posts.put(post.getId(), post);
-                System.out.println(post.getContent());
+                }
             }
             if (post.getId() == 0) {
                 post.setId(idCounter.incrementAndGet());
                 posts.put(post.getId(), post);
-                System.out.println(post.getContent());
             }
         }
         return post;
